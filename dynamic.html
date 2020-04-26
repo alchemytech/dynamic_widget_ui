@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <title>Dynamic Widget</title>
+
+    <style type="text/css">
+        .material-icons-outlined {
+            vertical-align: middle;
+        }
+
+        @media (min-width: 1200px) {
+            .bd-sidebar {
+                -ms-flex: 0 1 320px;
+                flex: 0 1 320px;
+            }
+        }
+
+        .bd-sidebar {
+            -ms-flex-order: 0;
+            order: 0;
+            border-bottom: 1px solid;
+            box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+			position: -webkit-sticky;
+            position: sticky;
+            top: 4rem;
+            height: calc(100vh - 4rem);
+            overflow-y: auto;
+
+        }
+
+        .bd-sidebar>div {
+            overflow-x: auto;
+        }
+
+        #draggable, .section-nav {
+            padding-left: 0;
+
+        }
+
+        .bd-sidebar li, .section-nav li {
+            list-style: none;
+        }
+
+		a.ui-draggable {
+            line-height: 1.5;
+            border: 1px solid transparent;
+            display: inline-flex;
+            width: 100%;
+            max-width: 300px;
+            padding: 5px 10px;
+        }
+
+        a.ui-draggable:hover {
+            text-decoration: none;
+            border: 1px solid #eee;
+        }
+
+        a.ui-draggable i {
+            width: 35px;
+        }
+
+        .bd-sidebar div {
+            z-index: 1;
+        }
+
+        .subheader {
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 15px 10px 5px;
+            font-size: 12px;
+        }
+
+        .ui-draggable-dragging {
+            width: 200px;
+            z-index: 1;
+        }
+
+        .ui-selected {
+            box-shadow: 0 0 0 2px #1CA1C1;
+            border-radius: 2px;
+        }
+
+        .bd-toc {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 4rem;
+            height: calc(100vh - 4rem);
+            overflow-y: auto;
+            -ms-flex-order: 2;
+            order: 2;
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+            font-size: .875rem;
+            border-left: 1px solid #eee;
+        }
+
+        #canvas {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cpattern id='a' width='10' height='10' patternUnits='userSpaceOnUse'%3E%3Cpath stroke-width='.5' stroke='%23EDEFF0' fill='%23FFFFFF' d='M0 0h10v10H0z'/%3E%3C/pattern%3E%3C/defs%3E%3Cpath fill='url(%23a)' stroke='%23DADEE0' d='M0 0h100v100H0z'/%3E%3C/svg%3E");
+            min-height: calc(100vh - 60px);
+        }
+        
+        .control {
+        	max-width: 640px;
+        	min-height: 70px;
+        	background-color: yellow;
+        	border: 1px solid #eee;
+        }
+        
+        .child {
+        	min-height: 50px;
+        	background-color: #eee;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Dynamic Widget</a>
+
+        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group mr-2 invisible" role="group" aria-label="First group">
+                <button type="button" class="btn"><i class="material-icons-outlined">undo</i></button>
+                <button type="button" class="btn"><i class="material-icons-outlined">redo</i></button>
+            </div>
+            <div class="btn-group mr-2" role="group" aria-label="Second group">
+                <button type="button" class="btn"><i class="material-icons-outlined">delete</i></button>
+            </div>
+        </div>
+
+        <div class="btn-group btn-group-toggle mx-auto" data-toggle="buttons" style="width: 222px;">
+            <label class="btn btn-secondary active">
+                <input type="radio" name="options" id="option1" checked> EDIT
+            </label>
+            <label class="btn btn-secondary">
+                <input type="radio" name="options" id="option2"> PREVIEW
+            </label>
+            <label class="btn btn-secondary">
+                <input type="radio" name="options" id="option3"> CODE
+            </label>
+        </div>
+
+
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row flex-xl-nowrap">
+            <div class="col-md-3 col-xl-2 bd-sidebar">
+                <div>
+                    <ul id="draggable">
+                        <li>
+                            <div class="subheader">Widget</div>
+                        </li>
+                        <li><a href="#container-widget"><i class="material-icons-outlined">crop_square</i> Container Widget</a></li>
+                        <li><a href="#text-widget"><i class="material-icons-outlined">crop_7_5</i> Text Widget</a></li>
+                        <li><a href="#row-widget"><i class="material-icons-outlined">more_horiz</i> Row Widget</a></li>
+                        <li><a href="#column-widget"><i class="material-icons-outlined">more_vert</i> Column Widget</a></li>
+                        <li><a href="#placeholder-widget"><i class="material-icons-outlined">remove</i> Placeholder Widget</a></li>
+                        <li><a href="#gridview-widget"><i class="material-icons-outlined">view_module</i> GridView Widget</a></li>
+                        <li><a href="#listview-widget"><i class="material-icons-outlined">view_list</i> ListView Widget</a></li>
+                        <li><a href="#pageview-widget"><i class="material-icons-outlined">insert_drive_file</i> PageView Widget</a></li>
+                        <li><a href="#expanded-widget"><i class="material-icons-outlined">unfold_more</i> Expanded Widget</a></li>
+                        <li><a href="#padding-widget"><i class="material-icons-outlined">zoom_out_map</i> Padding Widget</a></li>
+                        <li><a href="#center-widget"><i class="material-icons-outlined">format_align_center</i> Center Widget</a></li>
+                        <li><a href="#align-widget"><i class="material-icons-outlined">format_align_left</i> Align Widget</a></li>
+                        <li><a href="#aspectratio-widget"><i class="material-icons-outlined">image_aspect_ratio</i> AspectRatio Widget</a></li>
+                        <li><a href="#fittedbox-widget"><i class="material-icons-outlined">crop_square</i> FittedBox Widget</a></li>
+                        <li><a href="#baseline-widget"><i class="material-icons-outlined">minimize</i> Baseline Widget</a></li>
+                        <li><a href="#stack-widget"><i class="material-icons-outlined">view_agenda</i> Stack Widget</a></li>
+                        <li><a href="#positioned-widget"><i class="material-icons-outlined">remove</i> Positioned Widget</a></li>
+                        <li><a href="#indexedstack-widget"><i class="material-icons-outlined">view_list</i> IndexedStack Widget</a></li>
+                        <li><a href="#sizedbox-widget"><i class="material-icons-outlined">remove</i> SizedBox Widget</a></li>
+                        <li><a href="#expandedsizedbox-widget"><i class="material-icons-outlined">remove</i> ExpandedSizedBox Widget</a></li>
+                        <li><a href="#opacity-widget"><i class="material-icons-outlined">remove</i> Opacity Widget</a></li>
+                        <li><a href="#wrap-widget"><i class="material-icons-outlined">remove</i> Wrap Widget</a></li>
+                        <li><a href="#cliprrect-widget"><i class="material-icons-outlined">remove</i> ClipRRect Widget</a></li>
+                        <li><a href="#safearea-widget"><i class="material-icons-outlined">remove</i> SafeArea Widget</a></li>
+                        <li><a href="#selectabletext-widget"><i class="material-icons-outlined">remove</i> SelectableText Widget</a></li>
+                        <li><a href="#icon-widget"><i class="material-icons-outlined">insert_emoticon</i> Icon Widget</a></li>
+                        <li>
+                            <div class="subheader">Dart:UI</div>
+                        </li>
+                        <li><a href="#textstyle"><i class="material-icons-outlined">format_italic</i> TextStyle</a></li>
+                        <li>
+                            <div class="subheader">Material</div>
+                        </li>
+                        <li><a href="#raisedbutton-widget"><i class="material-icons-outlined">filter_none</i> RaisedButton Widget</a></li>
+                        <li><a href="#listtile-widget"><i class="material-icons-outlined">format_align_justify</i> ListTile Widget</a></li>
+                        <li>
+                            <div class="subheader">Painting</div>
+                        </li>
+                        <li><a href="#textspan"><i class="material-icons-outlined">crop_landscape</i> TextSpan</a></li>
+                        <li><a href="#assetimage-widget"><i class="material-icons-outlined">add_photo_alternate</i> AssetImage Widget</a></li>
+                        <li><a href="#networkimage-widget"><i class="material-icons-outlined">filter_drama</i> NetworkImage Widget</a></li>
+                        <li><a href="#fileimage-widget"><i class="material-icons-outlined">add_a_photo</i> FileImage Widget</a></li>
+                        <li>
+                            <div class="subheader">Package</div>
+                        </li>
+                        <li><a href="#dropcaptext-widget"><i class="material-icons-outlined">text_fields</i> DropCapText Widget</a></li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <nav class="d-none d-xl-block col-xl-2 bd-toc" aria-label="Secondary navigation">
+                <ul id="props" class="section-nav">
+                	<li data-for="#container-widget">
+                        <strong>Container Widget</strong>
+                    </li>
+                    <li data-for="#container-widget">
+                        <div class="form-group">
+                            <label for="alignment">Alignment</label>
+                            <select class="form-control" id="alignment">
+                                <option>topLeft</option>
+                                <option>topCenter</option>
+                                <option>topRight</option>
+                                <option>centerLeft</option>
+                                <option>center</option>
+                                <option>centerRight</option>
+                                <option>bottomLeft</option>
+                                <option>bottomCenter</option>
+                                <option>bottomRight</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li data-for="#container-widget">
+                        <div class="form-group">
+                            <label for="margin">Margin</label>
+                            <input type="text" class="form-control" id="margin" placeholder="8,10,12,8">
+                        </div>
+                    </li>
+                    <li data-for="#container-widget">
+                        <div class="form-group">
+                            <label for="padding">Padding</label>
+                            <input type="text" class="form-control" id="padding" placeholder="8,10,12,8">
+                        </div>
+                    </li>
+                    <li data-for="#container-widget">
+                        <div class="form-group">
+                            <label for="color">Color</label>
+                            <input type="text" class="form-control" id="color" placeholder="#FFFFFF">
+                        </div>
+                    </li>
+                    <li data-for="#container-widget">
+                        <div class="form-group">
+                            <label for="width">Width</label>
+                            <input type="number" class="form-control" id="width" placeholder="200">
+                        </div>
+                    </li>
+                    <li data-for="#container-widget">
+                        <div class="form-group">
+                            <label for="height">Height</label>
+                            <input type="number" class="form-control" id="height" placeholder="200">
+                        </div>
+                    </li>
+                    <li data-for="#container-widget">
+                        <div class="form-group">
+                            <label for="click_event">Click Event</label>
+                            <input type="text" class="form-control" id="click_event" placeholder="route://productDetail?goods_id=123">
+                        </div>
+                    </li>
+                    <li data-for="#text-widget">
+                        <strong>Text Widget</strong>
+                    </li>
+                    <li data-for="#text-widget">
+                        <div class="form-group">
+                            <label for="textAlign">Text Align</label>
+                            <select class="form-control" id="textAlign">
+                                <option>left</option>
+                                <option>right</option>
+                                <option>center</option>
+                                <option>justify</option>
+                                <option>start</option>
+                                <option>end</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li data-for="#text-widget">
+                        <div class="form-group">
+                            <label for="overflow">Overflow</label>
+                            <select class="form-control" id="overflow">
+                                <option>ellipsis</option>
+                                <option>clip</option>
+                                <option>fade</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li data-for="#text-widget">
+                        <div class="form-group">
+                            <label for="maxLines">Max Lines</label>
+                            <input type="number" class="form-control" id="maxLines" placeholder="3">
+                        </div>
+                    </li>
+                    <li data-for="#text-widget">
+                        <div class="form-group">
+                            <label for="semanticsLabel">Semantics Label</label>
+                            <input type="text" class="form-control" id="semanticsLabel">
+                        </div>
+                    </li>
+                    <li data-for="#text-widget">
+                        <div class="form-group">
+                            <label for="softWrap">Soft Wrap</label>
+                            <select class="form-control" id="softWrap">
+                                <option>true</option>
+                                <option>false</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li data-for="#text-widget">
+                        <div class="form-group">
+                            <label for="textDirection">Text Direction</label>
+                            <select class="form-control" id="textDirection">
+                                <option>ltr</option>
+                                <option>rtl</option>
+                            </select>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <main class="col-md-9 col-xl-8 mt-1" role="main">
+
+                <div id="canvas" class="editor">
+
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-migrate-3.1.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <script>
+        $(function() {
+
+            $("#draggable a").draggable({
+                opacity: 0.7,
+                helper: "clone",
+                revert: "invalid",
+                grid: [10, 10],
+                snap: true,
+                appendTo: 'body'
+            }).dblclick(addControl);
+
+			var canvas = document.getElementById("canvas");
+            var selected = [canvas];
+
+            $("#canvas").droppable({
+                drop: addControl
+            })/*.selectable({
+                filter: ".control",
+                stop: updateSelection
+            });*/
+            
+            $( "#canvas" ).on( "click", ".control", function(event) {
+            	updateSelectedControl($(this));
+                event.stopPropagation();
+			});
+			
+			$( "#canvas" ).on( "click", function(event) {
+            	$(".ui-selected").removeClass("ui-selected");
+                updateSelection();
+			});
+
+            function addControl(event, ui) {
+                var ele = ui ? ui.helper : $(event.currentTarget);
+                var hash = ele.prop("hash");
+                var container = selected[selected.length - 1];
+                var child = $(container).children(".child");
+                if (child.length) {
+	                container = child[0];
+                }
+                var ctrl = $(controlsObj[hash].html).data("hash", hash).appendTo(container);
+                
+                // update selection
+                updateSelectedControl(ctrl);
+            }
+            
+            function updateSelectedControl(ctrl) {
+                $(".ui-selected").removeClass("ui-selected");
+                ctrl.addClass("ui-selected");
+                updateSelection();
+            }
+            
+            function updateSelection() {
+            	selected = [];
+
+                    $(".ui-selected").each(function() {
+                        selected.push(this);
+                    });
+                    
+                    if (selected.length === 0) {
+                    	selected.push(canvas);
+                    }
+            }
+
+
+            var _default = {
+                html: "<div class='control'>This is one control<div class='child'>With child</div></div>",
+                prop: []
+            }
+
+            var controls = [
+                "#container-widget",
+                "#text-widget",
+                "#row-widget",
+                "#column-widget",
+                "#placeholder-widget",
+                "#gridview-widget",
+                "#listview-widget",
+                "#pageview-widget",
+                "#expanded-widget",
+                "#padding-widget",
+                "#center-widget",
+                "#align-widget",
+                "#aspectratio-widget",
+                "#fittedbox-widget",
+                "#baseline-widget",
+                "#stack-widget",
+                "#positioned-widget",
+                "#indexedstack-widget",
+                "#sizedbox-widget",
+                "#expandedsizedbox-widget",
+                "#opacity-widget",
+                "#wrap-widget",
+                "#cliprrect-widget",
+                "#safearea-widget",
+                "#selectabletext-widget",
+                "#icon-widget",
+                "#textstyle",
+                "#raisedbutton-widget",
+                "#listtile-widget",
+                "#textspan",
+                "#assetimage-widget",
+                "#networkimage-widget",
+                "#fileimage-widget",
+                "#dropcaptext-widget"
+            ];
+            var controlsObj = {};
+
+            controls.forEach(function(item, index) {
+                controlsObj[item] = Object.assign({}, _default);
+            });
+
+
+        });
+    </script>
+
+</body>
+
+</html>
